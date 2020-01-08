@@ -25,12 +25,12 @@ for i = 1:N % x_i
     for j = 1:N % x_j
         if i == 1
             D(i,j) = -omega_1_squared + commonPartXX(i);
-            D(i,j+4) = -commonPartXY(i);
-            D(i,j+8) = -commonPartXZ(i);
+            D(i,j+N) = -commonPartXY(i);
+            D(i,j+2*N) = -commonPartXZ(i);
         else
             D(i,j) = -commonPartXX(i);
-            D(i,j+4) = commonPartXY(i);
-            D(i,j+8) = commonPartXZ(i);
+            D(i,j+N) = commonPartXY(i);
+            D(i,j+2*N) = commonPartXZ(i);
         end
     end
 end
