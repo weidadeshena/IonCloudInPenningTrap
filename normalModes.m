@@ -1,74 +1,52 @@
 % assume M = 1, Ze^2/(4pi epsilon_0) = 1
 clear all
-global r r_d N;
-alpha = 0.9;
-N = 4;
+global r r_d N omega_1_squared omega_z_squared;
+alpha = 0.4;
+N = 10;
 G = Greens(alpha);
 omega_z_squared = G;
 omega_1_squared = (1-G)/2;
 final_positions = crystal_graphs_energy(N,omega_z_squared,omega_1_squared);
-r = zeros(4,3);
-for i = 1:4
+r = zeros(N,3);
+for i = 1:N
     r(i,:) = final_positions(i,1:3);
 end
-r_d = zeros(4,4);
-for i = 1:4
+r_d = zeros(N,N);
+for i = 1:N
     for j = 1:i
         r_d(i,j) = sqrt((r(i,1)-r(j,1))^2+(r(i,2)-r(j,2))^2+(r(i,3)-r(j,3))^2);
     end
 end
 r_d = (r_d + r_d') - eye(size(r_d,1)).*diag(r_d);
 
-D = zeros(12,12);
+D = zeros(3*N,3*N);
 % first N rows
 for i = 1:N % x_i
     for j = 1:N % x_j
-        if i == 1
-            D(i,j) = -omega_1_squared + commonPartXX(i);
-            D(i,j+N) = -commonPartXY(i);
-            D(i,j+2*N) = -commonPartXZ(i);
-        else
-            D(i,j) = -commonPartXX(i);
-            D(i,j+N) = commonPartXY(i);
-            D(i,j+2*N) = commonPartXZ(i);
-        end
+        D(i,j) = DXX(i,j);
+        D(i,j+N) = DXY(i,j);
+        D(i,j+2*N) = DXZ(i,j);
     end
 end
-
 % next 4 rows
 for i = 1:N % y_i
     for j = 1:N % y_j
-        if i == 1
-            D(N+i,j) = -commonPartYX(i);
-            D(N+i,j+N) = -omega_1_squared + commonPartYY(i);
-            D(N+i,j+2*N) = -commonPartYZ(i);
-        else
-            D(N+i,j) = commonPartYX(i);
-            D(N+i,j+N) = -commonPartYY(i);
-            D(N+i,j+2*N) = commonPartYZ(i);
-        end
+        D(i+N,j) = DYX(i,j);
+        D(i+N,j+N) = DYY(i,j);
+        D(i+N,j+2*N) = DYZ(i,j);
     end
 end
-
-% last four rows
+% last 4 rows
 for i = 1:N % z_i
     for j = 1:N %z_j
-        if i == 1
-            D(2*N+i,j) = -commonPartZX(i);
-            D(2*N+i,j+N) = -commonPartZY(i);
-            D(2*N+i,j+2*N) = -omega_z_squared + commonPartYZ(i);
-        else
-            D(2*N+i,j) = commonPartZX(i);
-            D(2*N+i,j+N) = commonPartZY(i);
-            D(2*N+i,j+2*N) = -commonPartZZ(i);
-        end
+        D(i+2*N,j) = DZX(i,j);
+        D(i+2*N,j+N) = DZY(i,j);
+        D(i+2*N,j+2*N) = DZZ(i,j);
     end
 end
 
 [EigVectors, DiagValue] = eig(D);
 EigValues = diag(DiagValue);
-
-
 
 function G = Greens(alpha)
     if alpha < 1
@@ -80,101 +58,136 @@ function G = Greens(alpha)
     end
 end
 
-function sumCommonPartXX = commonPartXX(ionIndex)
-    global r r_d N;
-    sumCommonPartXX = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
+function resXX = DXX(i,j)
+    global r r_d N omega_1_squared;
+    if i == j
+        resXX = -omega_1_squared;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resXX = resXX - (-1/r_d(i,k)^3 + 3/r_d(i,k)^5*(r(i,1)-r(k,1))^2);
         end
-        sumCommonPartXX = sumCommonPartXX + 1/r_d(ionIndex,i)^3 - 3/r_d(ionIndex,i)^5*(r(ionIndex,1) - r(i,1))^2;
+    else
+        resXX = - 1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,1) - r(j,1))^2;
     end
 end
 
-function sumCommonPartXY = commonPartXY(ionIndex)
+function resXY = DXY(i,j)
     global r r_d N;
-    sumCommonPartXY = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
+    if i == j
+        resXY = 0;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resXY = resXY - 3/r_d(i,k)^5*(r(i,1)-r(k,1))*(r(i,2)-r(k,2));
         end
-        sumCommonPartXY = sumCommonPartXY + 3/r_d(ionIndex,i)^5*(r(ionIndex,1) - r(i,1))*(r(ionIndex,2) - r(i,2));
+    else       
+        resXY = 3/r_d(i,j)^5*(r(i,1)-r(j,1))*(r(i,2)-r(j,2));
     end
 end
 
-function sumCommonPartXZ = commonPartXZ(ionIndex)
+function resXZ = DXZ(i,j)
     global r r_d N;
-    sumCommonPartXZ = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
+    if i==j
+        resXZ = 0;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resXZ = resXZ - 3/r_d(i,k)^5*(r(i,1)-r(k,1))*(r(i,3)-r(k,3));
         end
-        sumCommonPartXZ = sumCommonPartXZ + 3/r_d(ionIndex,i)^5*(r(ionIndex,1) - r(i,1))*(r(ionIndex,3) - r(i,3));
+    else
+        resXZ = 3/r_d(i,j)^5*(r(i,1)-r(j,1))*(r(i,3)-r(j,3));
     end
 end
 
-function sumCommonPartYY = commonPartYY(ionIndex)
-    global r r_d N;
-    sumCommonPartYY = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
+function resYY = DYY(i,j)
+    global r r_d N omega_1_squared;
+    if i == j
+        resYY = -omega_1_squared;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resYY = resYY + (1/r_d(i,k)^3 - 3/r_d(i,k)^5*(r(i,2)-r(k,2))^2);
         end
-        sumCommonPartYY = sumCommonPartYY + 1/r_d(ionIndex,i)^3 - 3/r_d(ionIndex,i)^5*(r(ionIndex,2) - r(i,2))^2;
-    end
-end
-
-function sumCommonPartYX = commonPartYX(ionIndex)
-    global r r_d N;
-    sumCommonPartYX = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
-        end
-        sumCommonPartYX = sumCommonPartYX + 3/r_d(ionIndex,i)^5*(r(ionIndex,1) - r(i,1))*(r(ionIndex,2) - r(i,2));
-    end
-end
-
-function sumCommonPartYZ = commonPartYZ(ionIndex)
-    global r r_d N;
-    sumCommonPartYZ = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
-        end
-        sumCommonPartYZ = sumCommonPartYZ + 3/r_d(ionIndex,i)^5*(r(ionIndex,2) - r(i,2))*(r(ionIndex,3) - r(i,3));
+    else
+        resYY = - (1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,2)-r(j,2))^2);
     end
 end
     
-function sumCommonPartZZ = commonPartZZ(ionIndex)
+function resYX = DYX(i,j)
     global r r_d N;
-    sumCommonPartZZ = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
+    if i == j
+        resYX = 0;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resYX = resYX - 3/r_d(i,k)^5*(r(i,2)-r(k,2))*(r(i,1)-r(k,1));
         end
-        sumCommonPartZZ = sumCommonPartZZ + 1/r_d(ionIndex,i)^3 - 3/r_d(ionIndex,i)^5*(r(ionIndex,3) - r(i,3))^2;
+    else
+        resYX = 3/r_d(i,j)^5*(r(i,2)-r(j,2))*(r(i,1)-r(j,1));
     end
 end
 
-function sumCommonPartZY = commonPartZY(ionIndex)
+function resYZ = DYZ(i,j)
     global r r_d N;
-    sumCommonPartZY = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
+    if i==j
+        resYZ = 0;
+        for k = 1:N
+            if i == k 
+                continue, end
+            resYZ = resYZ - 3/r_d(i,k)^5*(r(i,2)-r(k,2))*(r(i,3)-r(k,3));
         end
-        sumCommonPartZY = sumCommonPartZY + 3/r_d(ionIndex,i)^5*(r(ionIndex,3) - r(i,3))*(r(ionIndex,2) - r(i,2));
+    else
+        resYZ = 3/r_d(i,j)^5*(r(i,2)-r(j,2))*(r(i,3)-r(j,3));
+    end
+end
+    
+function resZZ = DZZ(i,j)
+    global r r_d N omega_z_squared;
+    if i == j
+        resZZ = -omega_z_squared;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resZZ = resZZ + 1/r_d(i,k)^3 - 3/r_d(i,k)^5*(r(i,3)-r(k,3))^2;
+        end
+    else
+        resZZ = -1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,3)-r(j,3))^2;
     end
 end
 
-function sumCommonPartZX = commonPartZX(ionIndex)
+function resZY = DZY(i,j)
     global r r_d N;
-    sumCommonPartZX = 0;
-    for i = 1:N
-        if i == ionIndex
-            continue
+    if i == j
+        resZY = 0;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resZY = resZY - 3/r_d(i,k)^5*(r(i,3)-r(k,3))*(r(i,2)-r(k,2));
         end
-        sumCommonPartZX = sumCommonPartZX + 3/r_d(ionIndex,i)^5*(r(ionIndex,1) - r(i,1))*(r(ionIndex,3) - r(i,3));
+    else
+        resZY = 3/r_d(i,j)^5*(r(i,3)-r(j,3))*(r(i,2)-r(j,2));
+    end
+end
+
+function resZX = DZX(i,j)
+    global r r_d N;
+    if i == j
+        resZX = 0;
+        for k = 1:N
+            if i == k
+                continue
+            end
+            resZX = resZX - 3/r_d(i,k)^5*(r(i,3)-r(k,3))*(r(i,1)-r(k,1));
+        end
+    else
+        resZX = 3/r_d(i,j)^5*(r(i,3)-r(j,3))*(r(i,1)-r(j,1));
     end
 end

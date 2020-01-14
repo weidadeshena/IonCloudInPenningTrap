@@ -8,23 +8,23 @@ final_positions(:,4) = sqrt(final_positions(:,1).^2 + final_positions(:,2).^2 );
 min_axis = min(min(final_positions(:,:)));
 max_axis = max(max(final_positions(:,:)));
 
-% figure(1)
-% hold off;
-% for ion_number = 1:ions
-%     
-%     plot3(ion_positions(end,ion_number*3-2),ion_positions(end,ion_number*3-1),ion_positions(end,3*ion_number),'b*');
-%     
-%     hold on
-% end
-% 
-% 
-% 
-% axis([min_axis max_axis min_axis max_axis min_axis max_axis]);
-% axis square
-% grid on
-% view(0,0)
+figure(1)
+hold off;
+for ion_number = 1:ions
+    
+    plot3(ion_positions(end,ion_number*3-2),ion_positions(end,ion_number*3-1),ion_positions(end,3*ion_number),'b*');
+    
+    hold on
+end
 
-%plot3(final_positions(:,4),zeros(size(final_positions,1)),final_positions(:,3),'ro')
+
+
+axis([min_axis max_axis min_axis max_axis min_axis max_axis]);
+axis square
+grid on
+view(0,0)
+
+% plot3(final_positions(:,4),zeros(size(final_positions,1)),final_positions(:,3),'ro')
 
 hold off
 
@@ -187,7 +187,7 @@ function [positions] = crystals(num_of_ions,omegaz_squared,omega1_squared)
 %Write this initial script for n ions
 %Put constants here.
 %num_of_ions = 3;
-num_of_time_steps = 5000;
+num_of_time_steps = 10000;
 %omega1_squared = 1-0.5*omegaz_squared;
 time_step_size = 0.1;
 
