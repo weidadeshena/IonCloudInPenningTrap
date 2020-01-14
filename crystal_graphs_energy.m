@@ -24,7 +24,6 @@ axis square
 grid on
 view(0,0)
 
-% plot3(final_positions(:,4),zeros(size(final_positions,1)),final_positions(:,3),'ro')
 
 hold off
 
@@ -191,25 +190,25 @@ num_of_time_steps = 10000;
 %omega1_squared = 1-0.5*omegaz_squared;
 time_step_size = 0.1;
 
-ion_forces = zeros(num_of_time_steps,num_of_ions*3,num_of_ions);
-positions = zeros(num_of_time_steps,3*num_of_ions);
+ion_forces = zeros(num_of_ions*3,num_of_ions);
+positions = zeros(2,3*num_of_ions);
 ion_ion_distance_cubed = zeros(num_of_ions, num_of_ions);
-trap_forces = zeros(num_of_time_steps,3*num_of_ions);
-total_force = zeros(num_of_time_steps,3*num_of_ions);
+trap_forces = zeros(3*num_of_ions);
+% total_force = zeros(num_of_time_steps,3*num_of_ions);
 
 positions(1,:) = rand(1,3*num_of_ions);
 
 tic
 
-for time_step = 1:num_of_time_steps;
+for time_step = 1:num_of_time_steps
 
 
 for ion_number = 1:num_of_ions
     
     for k = 1:num_of_ions
-        xxx = ( positions(time_step,3*ion_number-2) - positions(time_step,3*k -2))^2;
-        yyy = ( positions(time_step,3*ion_number-1) - positions(time_step,3*k -1))^2;
-        zzz = ( positions(time_step,3*ion_number) - positions(time_step,3*k))^2;
+        xxx = ( positions(1,3*ion_number-2) - positions(1,3*k -2))^2;
+        yyy = ( positions(1,3*ion_number-1) - positions(1,3*k -1))^2;
+        zzz = ( positions(1,3*ion_number) - positions(1,3*k))^2;
         ion_ion_distance_cubed(ion_number,k) = (xxx + yyy + zzz)^1.5;
     end
     
@@ -223,15 +222,15 @@ for ion_number = 1:num_of_ions
     
         if l ~= ion_number
         
-            ion_forces(time_step,l*3-2,ion_number) = (-positions(time_step,3*l -2) + positions(time_step,3*ion_number-2))...
+            ion_forces(l*3-2,ion_number) = (-positions(1,3*l -2) + positions(1,3*ion_number-2))...
             /ion_ion_distance_cubed(ion_number,l);
             %force from the x-direction
     
-            ion_forces(time_step,l*3-1,ion_number) = (-positions(time_step,3*l -1) + positions(time_step,3*ion_number-1))...
+            ion_forces(l*3-1,ion_number) = (-positions(1,3*l -1) + positions(1,3*ion_number-1))...
             /ion_ion_distance_cubed(ion_number,l);
             %force from the y-direction
     
-            ion_forces(time_step,l*3,ion_number) = (-positions(time_step,3*l) + positions(time_step,3*ion_number))...
+            ion_forces(l*3,ion_number) = (-positions(1,3*l) + positions(1,3*ion_number))...
             /ion_ion_distance_cubed(ion_number,l);
             %force from the z-direction
             
@@ -243,9 +242,9 @@ end
 
 for ion_number = 1:num_of_ions
     
-    trap_forces(time_step,ion_number*3-2) = -omega1_squared * positions(time_step,3*ion_number-2);
-    trap_forces(time_step,ion_number*3-1) = -omega1_squared * positions(time_step,3*ion_number-1);
-    trap_forces(time_step,ion_number*3)   = -omegaz_squared * positions(time_step,3*ion_number);
+    trap_forces(ion_number*3-2) = -omega1_squared * positions(1,3*ion_number-2);
+    trap_forces(ion_number*3-1) = -omega1_squared * positions(1,3*ion_number-1);
+    trap_forces(ion_number*3)   = -omegaz_squared * positions(1,3*ion_number);
     
     
 end
@@ -254,13 +253,14 @@ end
 
 for ion_number = 1:num_of_ions
    
-        positions(time_step+1,3*ion_number-2) = positions (time_step,3*ion_number-2) + time_step_size*(sum(ion_forces(time_step,1:3:end,ion_number)) + trap_forces(time_step,3*ion_number-2));
-        positions(time_step+1,3*ion_number-1) = positions (time_step,3*ion_number-1) + time_step_size*(sum(ion_forces(time_step,2:3:end,ion_number)) + trap_forces(time_step,3*ion_number-1));
-        positions(time_step+1,3*ion_number) = positions (time_step,3*ion_number) + time_step_size*(sum(ion_forces(time_step,3:3:end,ion_number)) + trap_forces(time_step,3*ion_number));
+        positions(2,3*ion_number-2) = positions (1,3*ion_number-2) + time_step_size*(sum(ion_forces(1:3:end,ion_number)) + trap_forces(3*ion_number-2));
+        positions(2,3*ion_number-1) = positions (1,3*ion_number-1) + time_step_size*(sum(ion_forces(2:3:end,ion_number)) + trap_forces(3*ion_number-1));
+        positions(2,3*ion_number) = positions (1,3*ion_number) + time_step_size*(sum(ion_forces(3:3:end,ion_number)) + trap_forces(3*ion_number));
+        positions(1,:) = positions(2,:);
 
-        total_force(time_step,ion_number*3-2) = sum(ion_forces(time_step,1:3:end,ion_number)) + trap_forces(time_step,3*ion_number-2);
-        total_force(time_step,ion_number*3-1) = sum(ion_forces(time_step,2:3:end,ion_number)) + trap_forces(time_step,3*ion_number-1);
-        total_force(time_step,ion_number*3) = sum(ion_forces(time_step,3:3:end,ion_number)) + trap_forces(time_step,3*ion_number);
+%         total_force(time_step,ion_number*3-2) = sum(ion_forces(1:3:end,ion_number)) + trap_forces(3*ion_number-2);
+%         total_force(time_step,ion_number*3-1) = sum(ion_forces(2:3:end,ion_number)) + trap_forces(3*ion_number-1);
+%         total_force(time_step,ion_number*3) = sum(ion_forces(3:3:end,ion_number)) + trap_forces(3*ion_number);
 end
 
 end
