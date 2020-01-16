@@ -13,8 +13,8 @@ for i = 1:N
 end
 r_d = zeros(N,N);
 for i = 1:N
-    for j = 1:i
-        r_d(i,j) = sqrt((r(i,1)-r(j,1))^2+(r(i,2)-r(j,2))^2+(r(i,3)-r(j,3))^2);
+    for j = 1:N
+        r_d(i,j) = sqrt(sum((r(i,:)-r(j,:)).^2));
     end
 end
 r_d = (r_d + r_d') - eye(size(r_d,1)).*diag(r_d);
