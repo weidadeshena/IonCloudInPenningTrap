@@ -7,10 +7,7 @@ G = Greens(alpha);
 omega_z_squared = G;
 omega_1_squared = (1-G)/2;
 final_positions = crystal_graphs_energy(N,omega_z_squared,omega_1_squared);
-r = zeros(N,3);
-for i = 1:N
-    r(i,:) = final_positions(i,1:3);
-end
+r = final_positions(:,1:3);
 r_d = zeros(N,N);
 for i = 1:N
     for j = 1:i
@@ -63,10 +60,9 @@ function resXX = DXX(i,j)
     if i == j
         resXX = -omega_1_squared;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resXX = resXX - (-1/r_d(i,k)^3 + 3/r_d(i,k)^5*(r(i,1)-r(k,1))^2);
             end
-            resXX = resXX - (-1/r_d(i,k)^3 + 3/r_d(i,k)^5*(r(i,1)-r(k,1))^2);
         end
     else
         resXX = - 1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,1) - r(j,1))^2;
@@ -78,10 +74,9 @@ function resXY = DXY(i,j)
     if i == j
         resXY = 0;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resXY = resXY - 3/r_d(i,k)^5*(r(i,1)-r(k,1))*(r(i,2)-r(k,2));
             end
-            resXY = resXY - 3/r_d(i,k)^5*(r(i,1)-r(k,1))*(r(i,2)-r(k,2));
         end
     else       
         resXY = 3/r_d(i,j)^5*(r(i,1)-r(j,1))*(r(i,2)-r(j,2));
@@ -93,11 +88,10 @@ function resXZ = DXZ(i,j)
     if i==j
         resXZ = 0;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resXZ = resXZ - 3/r_d(i,k)^5*(r(i,1)-r(k,1))*(r(i,3)-r(k,3));
             end
-            resXZ = resXZ - 3/r_d(i,k)^5*(r(i,1)-r(k,1))*(r(i,3)-r(k,3));
-        end
+         end
     else
         resXZ = 3/r_d(i,j)^5*(r(i,1)-r(j,1))*(r(i,3)-r(j,3));
     end
@@ -108,11 +102,10 @@ function resYY = DYY(i,j)
     if i == j
         resYY = -omega_1_squared;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resYY = resYY + (1/r_d(i,k)^3 - 3/r_d(i,k)^5*(r(i,2)-r(k,2))^2);
             end
-            resYY = resYY + (1/r_d(i,k)^3 - 3/r_d(i,k)^5*(r(i,2)-r(k,2))^2);
-        end
+         end
     else
         resYY = - (1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,2)-r(j,2))^2);
     end
@@ -123,10 +116,9 @@ function resYX = DYX(i,j)
     if i == j
         resYX = 0;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resYX = resYX - 3/r_d(i,k)^5*(r(i,2)-r(k,2))*(r(i,1)-r(k,1));
             end
-            resYX = resYX - 3/r_d(i,k)^5*(r(i,2)-r(k,2))*(r(i,1)-r(k,1));
         end
     else
         resYX = 3/r_d(i,j)^5*(r(i,2)-r(j,2))*(r(i,1)-r(j,1));
@@ -138,9 +130,9 @@ function resYZ = DYZ(i,j)
     if i==j
         resYZ = 0;
         for k = 1:N
-            if i == k 
-                continue, end
-            resYZ = resYZ - 3/r_d(i,k)^5*(r(i,2)-r(k,2))*(r(i,3)-r(k,3));
+            if i ~= k 
+                resYZ = resYZ - 3/r_d(i,k)^5*(r(i,2)-r(k,2))*(r(i,3)-r(k,3));
+            end
         end
     else
         resYZ = 3/r_d(i,j)^5*(r(i,2)-r(j,2))*(r(i,3)-r(j,3));
@@ -152,10 +144,9 @@ function resZZ = DZZ(i,j)
     if i == j
         resZZ = -omega_z_squared;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resZZ = resZZ + 1/r_d(i,k)^3 - 3/r_d(i,k)^5*(r(i,3)-r(k,3))^2;
             end
-            resZZ = resZZ + 1/r_d(i,k)^3 - 3/r_d(i,k)^5*(r(i,3)-r(k,3))^2;
         end
     else
         resZZ = -1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,3)-r(j,3))^2;
@@ -167,10 +158,9 @@ function resZY = DZY(i,j)
     if i == j
         resZY = 0;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resZY = resZY - 3/r_d(i,k)^5*(r(i,3)-r(k,3))*(r(i,2)-r(k,2));
             end
-            resZY = resZY - 3/r_d(i,k)^5*(r(i,3)-r(k,3))*(r(i,2)-r(k,2));
         end
     else
         resZY = 3/r_d(i,j)^5*(r(i,3)-r(j,3))*(r(i,2)-r(j,2));
@@ -182,10 +172,9 @@ function resZX = DZX(i,j)
     if i == j
         resZX = 0;
         for k = 1:N
-            if i == k
-                continue
+            if i ~= k
+                resZX = resZX - 3/r_d(i,k)^5*(r(i,3)-r(k,3))*(r(i,1)-r(k,1));
             end
-            resZX = resZX - 3/r_d(i,k)^5*(r(i,3)-r(k,3))*(r(i,1)-r(k,1));
         end
     else
         resZX = 3/r_d(i,j)^5*(r(i,3)-r(j,3))*(r(i,1)-r(j,1));
