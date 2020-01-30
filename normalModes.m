@@ -1,52 +1,59 @@
 % assume M = 1, Ze^2/(4pi epsilon_0) = 1
 clear all
-global r r_d N omega_1_squared omega_z_squared;
-alpha = 0.4;
-N = 10;
-G = Greens(alpha);
-omega_z_squared = G;
-omega_1_squared = (1-G)/2;
-final_positions = crystal_graphs_energy(N,omega_z_squared,omega_1_squared);
-r = zeros(N,3);
-for i = 1:N
-    r(i,:) = final_positions(i,1:3);
-end
-r_d = zeros(N,N);
-for i = 1:N
-    for j = 1:N
-        r_d(i,j) = sqrt(sum((r(i,:)-r(j,:)).^2));
-    end
-end
-r_d = (r_d + r_d') - eye(size(r_d,1)).*diag(r_d);
+% global r r_d N omega_1_squared omega_z_squared;
+[EigValues,EigVectors,wz,w1,positions] = findNormalModes(3,4);
+save('NormalModes')
+% clf
+% hAxes = axes('NextPlot','add',...           %# Add subsequent plots to the axes,
+%              'DataAspectRatio',[1 1 1],...  %#   match the scaling of each axis,
+%              'XLim',[-1.01 0.01],...               %#   set the x axis limit,
+%              'YLim',[0 eps],...             %#   set the y axis limit (tiny!),
+%              'Color','none');               %#   and don't use a background color
+% plot(EigValues,0,'bx');
 
-D = zeros(3*N,3*N);
-% first N rows
-for i = 1:N % x_i
-    for j = 1:N % x_j
-        D(i,j) = DXX(i,j);
-        D(i,j+N) = DXY(i,j);
-        D(i,j+2*N) = DXZ(i,j);
+% histogram(EigValues,30)
+
+function [EigValues,EigVectors,omega_z_squared,omega_1_squared,r]=findNormalModes(alpha, N)
+    global r r_d omega_z_squared omega_1_squared N;
+    G = Greens(alpha);
+    omega_z_squared = G;
+    omega_1_squared = (1-G)/2;
+    final_positions = crystal_graphs_energy(N,omega_z_squared,omega_1_squared);
+    r = zeros(N,3);
+    for i = 1:N
+        r(i,:) = final_positions(i,1:3);
     end
-end
-% next 4 rows
-for i = 1:N % y_i
-    for j = 1:N % y_j
-        D(i+N,j) = DYX(i,j);
-        D(i+N,j+N) = DYY(i,j);
-        D(i+N,j+2*N) = DYZ(i,j);
+    r_d = zeros(N,N);
+    for i = 1:N
+        for j = 1:N
+            r_d(i,j) = sqrt(sum((r(i,:)-r(j,:)).^2));
+        end
     end
-end
-% last 4 rows
-for i = 1:N % z_i
-    for j = 1:N %z_j
-        D(i+2*N,j) = DZX(i,j);
-        D(i+2*N,j+N) = DZY(i,j);
-        D(i+2*N,j+2*N) = DZZ(i,j);
+    % r_d = (r_d + r_d') - eye(size(r_d,1)).*diag(r_d);
+
+    D = zeros(3*N,3*N);
+
+    for i = 1:N % x_i
+        for j = 1:N % x_j
+            % first N rows (x)
+            D(i,j) = DXX(i,j);
+            D(i,j+N) = DXY(i,j);
+            D(i,j+2*N) = DXZ(i,j);
+            % next N rows (y)
+            D(i+N,j) = DYX(i,j);
+            D(i+N,j+N) = DYY(i,j);
+            D(i+N,j+2*N) = DYZ(i,j);
+            % last N rows (z)
+            D(i+2*N,j) = DZX(i,j);
+            D(i+2*N,j+N) = DZY(i,j);
+            D(i+2*N,j+2*N) = DZZ(i,j);
+        end
     end
+    [EigVectors, DiagValue] = eig(D);
+    EigValues = diag(DiagValue);
 end
 
-[EigVectors, DiagValue] = eig(D);
-EigValues = diag(DiagValue);
+function w_p = plasmaFreq(alpha,r)
 
 function G = Greens(alpha)
     if alpha < 1
@@ -55,6 +62,8 @@ function G = Greens(alpha)
     elseif alpha > 1
         beta = sqrt(alpha^2-1);
         G = -1/beta^2 + alpha/(2*beta^3)*log(abs((alpha+beta)/(alpha-beta)));
+    else
+        G = 0.3334;
     end
 end
 
@@ -114,7 +123,7 @@ function resYY = DYY(i,j)
             resYY = resYY + (1/r_d(i,k)^3 - 3/r_d(i,k)^5*(r(i,2)-r(k,2))^2);
         end
     else
-        resYY = - (1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,2)-r(j,2))^2);
+        resYY = - 1/r_d(i,j)^3 + 3/r_d(i,j)^5*(r(i,2)-r(j,2))^2;
     end
 end
     
