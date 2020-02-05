@@ -60,126 +60,126 @@ total_energy = total_coulomb_energy+ total_trap_energy;
 total_energy
 
 
-%figure(2)
-% [gaussian_filtered_image,simulated_image] = simulate_image(final_positions(:,4),final_positions(:,3));
-% %axis square
-% 
-% 
-% function [filtered_image,sim_image] = simulate_image(amplitude,z_pos);
-% %Make a 2d image where the photo lives
-% pixel_unit_scaling = 3.8;
-% image_size = 101;%round(2* max(max(pixel_unit_scaling*amplitude),max(pixel_unit_scaling*abs(z_pos)))) + 10;
-% 
-% sim_image = zeros(round(image_size));
-% image_parts = sim_image;
-% extra_ion = sim_image;
-% distance_from_centre = (1:image_size) - image_size/2 - 0.5;
-% 
-% %amplitude = 20;
-% pixel_size = 1;
-% %start with one particle oscillating with amplitude = 20
-% %ion_positions = zeros(size(amplitude,1),5);
-% 
-% % ion_positions(:,1)=51 - pixel_unit_scaling .* z_pos;
-% % ion_positions(:,2)=floor(51 - pixel_unit_scaling .* z_pos);
-% % ion_positions(:,3)=1 + floor(51-pixel_unit_scaling.*z_pos) - (51-pixel_unit_scaling.*z_pos);
-% % ion_positions(:,4)=ceil(51-pixel_unit_scaling.*z_pos);
-% % ion_positions(:,5)=( - floor(51-pixel_unit_scaling.*z_pos) + (51-pixel_unit_scaling.*z_pos));
-% 
-% for k = 1:size(amplitude,1)
-% 
-%     
-%     if amplitude(k) < 0.001 
-%         
-% %         image_parts(floor(51 - pixel_unit_scaling * z_pos(k)),50) = ...
-% %         (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k))) * 0.5;
-% %         
-% %         sim_image = sim_image + image_parts;
-% % 
-% %         image_parts(:,:) = 0;
-%         
-%         
-%         image_parts(floor(51 - pixel_unit_scaling * z_pos(k)),51) = ...
-%         1- ((51-pixel_unit_scaling*z_pos(k)) - floor(51-pixel_unit_scaling*z_pos(k)) );   
-%     
-% 
-%     
-%         sim_image = sim_image + image_parts;
-% 
-%         image_parts(:) = 0;
-%         
-%         
-% %         image_parts(floor(51-pixel_unit_scaling*z_pos(k)),50) = ...
-% %         (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k))) * 0.5;
-% %         
-% %         sim_image = sim_image + image_parts;
-% % 
-% %         image_parts(:,:) = 0;
-%         
-%         
-%         image_parts(ceil(51-pixel_unit_scaling*z_pos(k)),51) = ...
-%         ( - floor(51-pixel_unit_scaling*z_pos(k)) + (51-pixel_unit_scaling*z_pos(k)));     
-%     
-%         
+figure(2)
+[gaussian_filtered_image,simulated_image] = simulate_image(final_positions(:,4),final_positions(:,3));
+%axis square
+
+
+function [filtered_image,sim_image] = simulate_image(amplitude,z_pos);
+%Make a 2d image where the photo lives
+pixel_unit_scaling = 3.8;
+image_size = 101;%round(2* max(max(pixel_unit_scaling*amplitude),max(pixel_unit_scaling*abs(z_pos)))) + 10;
+
+sim_image = zeros(round(image_size));
+image_parts = sim_image;
+extra_ion = sim_image;
+distance_from_centre = (1:image_size) - image_size/2 - 0.5;
+
+%amplitude = 20;
+pixel_size = 1;
+%start with one particle oscillating with amplitude = 20
+%ion_positions = zeros(size(amplitude,1),5);
+
+% ion_positions(:,1)=51 - pixel_unit_scaling .* z_pos;
+% ion_positions(:,2)=floor(51 - pixel_unit_scaling .* z_pos);
+% ion_positions(:,3)=1 + floor(51-pixel_unit_scaling.*z_pos) - (51-pixel_unit_scaling.*z_pos);
+% ion_positions(:,4)=ceil(51-pixel_unit_scaling.*z_pos);
+% ion_positions(:,5)=( - floor(51-pixel_unit_scaling.*z_pos) + (51-pixel_unit_scaling.*z_pos));
+
+for k = 1:size(amplitude,1)
+
+    
+    if amplitude(k) < 0.001 
+        
+%         image_parts(floor(51 - pixel_unit_scaling * z_pos(k)),50) = ...
+%         (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k))) * 0.5;
 %         
 %         sim_image = sim_image + image_parts;
 % 
-%         image_parts(:) = 0;
-%         
-%     else
-%         
-%         
-%         image_parts(floor(51 - pixel_unit_scaling * z_pos(k)),:) = ...
-%         (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k))) *...
-%         real( asin((distance_from_centre + pixel_size/2)/(pixel_unit_scaling*amplitude(k)))...
-%         - asin((distance_from_centre - pixel_size/2)/(pixel_unit_scaling*amplitude(k))) ) / pi;    
-% 
-% %   (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k)))% *...
-% 
-%         extra_ion = extra_ion + image_parts;
-%         
-%         image_parts(:) = 0;
-% 
-% 
-% 
-%         image_parts(ceil(51-pixel_unit_scaling*z_pos(k)),:) = ...
-%         ( - floor(51-pixel_unit_scaling*z_pos(k)) + (51-pixel_unit_scaling*z_pos(k))) *...
-%         real( asin((distance_from_centre + pixel_size/2)/(pixel_unit_scaling*amplitude(k)))...
-%         - asin((distance_from_centre - pixel_size/2)/(pixel_unit_scaling*amplitude(k))) ) / pi;   
-% 
-%     
-%  %  ( - floor(51-pixel_unit_scaling*z_pos(k)) + (51-pixel_unit_scaling*z_pos(k))) %* 
-% 
-% 
-%         extra_ion = extra_ion + image_parts;
-% 
-%         image_parts(:) = 0;
-%         sum(extra_ion(:));
-%         %extra_ion = 1/sum(extra_ion(:));
-%         
-%         sim_image = sim_image + extra_ion;
-%         extra_ion(:) = 0;
-%     end
-%     
-% end
-% 
-% %normalising image matrix
-% 
-% %sum(sim_image(:));
-% 
-% %tic
-% gaussian_filter = fspecial('gaussian',5,1.1);
-% filtered_image = imfilter(sim_image,gaussian_filter);
-%toc
+%         image_parts(:,:) = 0;
+        
+        
+        image_parts(floor(51 - pixel_unit_scaling * z_pos(k)),51) = ...
+        1- ((51-pixel_unit_scaling*z_pos(k)) - floor(51-pixel_unit_scaling*z_pos(k)) );   
+    
 
-%colorbar
-%figure(1)
-%imagesc(sim_image);
-%colorbar
-%figure(2)
-%imagesc(filtered_image);
-%colorbar
+    
+        sim_image = sim_image + image_parts;
 
+        image_parts(:) = 0;
+        
+        
+%         image_parts(floor(51-pixel_unit_scaling*z_pos(k)),50) = ...
+%         (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k))) * 0.5;
+%         
+%         sim_image = sim_image + image_parts;
+% 
+%         image_parts(:,:) = 0;
+        
+        
+        image_parts(ceil(51-pixel_unit_scaling*z_pos(k)),51) = ...
+        ( - floor(51-pixel_unit_scaling*z_pos(k)) + (51-pixel_unit_scaling*z_pos(k)));     
+    
+        
+        
+        sim_image = sim_image + image_parts;
+
+        image_parts(:) = 0;
+        
+    else
+        
+        
+        image_parts(floor(51 - pixel_unit_scaling * z_pos(k)),:) = ...
+        (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k))) *...
+        real( asin((distance_from_centre + pixel_size/2)/(pixel_unit_scaling*amplitude(k)))...
+        - asin((distance_from_centre - pixel_size/2)/(pixel_unit_scaling*amplitude(k))) ) / pi;    
+
+%   (1 + floor(51-pixel_unit_scaling*z_pos(k)) - (51-pixel_unit_scaling*z_pos(k)))% *...
+
+        extra_ion = extra_ion + image_parts;
+        
+        image_parts(:) = 0;
+
+
+
+        image_parts(ceil(51-pixel_unit_scaling*z_pos(k)),:) = ...
+        ( - floor(51-pixel_unit_scaling*z_pos(k)) + (51-pixel_unit_scaling*z_pos(k))) *...
+        real( asin((distance_from_centre + pixel_size/2)/(pixel_unit_scaling*amplitude(k)))...
+        - asin((distance_from_centre - pixel_size/2)/(pixel_unit_scaling*amplitude(k))) ) / pi;   
+
+    
+ %  ( - floor(51-pixel_unit_scaling*z_pos(k)) + (51-pixel_unit_scaling*z_pos(k))) %* 
+
+
+        extra_ion = extra_ion + image_parts;
+
+        image_parts(:) = 0;
+        sum(extra_ion(:));
+        %extra_ion = 1/sum(extra_ion(:));
+        
+        sim_image = sim_image + extra_ion;
+        extra_ion(:) = 0;
+    end
+    
+end
+
+%normalising image matrix
+
+%sum(sim_image(:));
+
+%tic
+gaussian_filter = fspecial('gaussian',5,1.1);
+filtered_image = imfilter(sim_image,gaussian_filter);
+toc
+
+% colorbar
+% figure(1)
+% imagesc(sim_image);
+% colorbar
+figure(2)
+imagesc(filtered_image);
+% colorbar
+% 
 % amplitude
 % ion_positions
 
@@ -189,7 +189,7 @@ function [positions] = crystals(num_of_ions,omegaz_squared,omega1_squared)
 %Write this initial script for n ions
 %Put constants here.
 %num_of_ions = 3;
-num_of_time_steps = 10000;
+num_of_time_steps = 20000;
 %omega1_squared = 1-0.5*omegaz_squared;
 time_step_size = 0.1;
 

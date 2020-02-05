@@ -1,8 +1,9 @@
 % assume M = 1, Ze^2/(4pi epsilon_0) = 1
 clear all
 % global r r_d N omega_1_squared omega_z_squared;
-[EigValues,EigVectors,wz,w1,positions] = findNormalModes(3,4);
-save('NormalModes')
+[EigValues,EigVectors,wz,w1,positions,r_d,radius] = findNormalModes(4,3);
+% save('NormalModes')
+% save('NormalModes_nonspherical')
 % clf
 % hAxes = axes('NextPlot','add',...           %# Add subsequent plots to the axes,
 %              'DataAspectRatio',[1 1 1],...  %#   match the scaling of each axis,
@@ -11,18 +12,37 @@ save('NormalModes')
 %              'Color','none');               %#   and don't use a background color
 % plot(EigValues,0,'bx');
 
-% histogram(EigValues,30)
+% histogram(EigValues,50)
 
-function [EigValues,EigVectors,omega_z_squared,omega_1_squared,r]=findNormalModes(alpha, N)
+%find radii for N=6,8,30
+
+% EigValueData = acrossAlphaData(3);
+
+function [EigValueData,EigVectorData] = acrossAlphaData(N)
+    alpha = [0.1 0.2 0.3 0.4 0.5 0.6 0.85 1 1.2 1.67 2 2.5 3.3 5 10];
+    EigValueData = [];
+    EigVectorData = [];
+    for i = 1:length(alpha)
+        [EigValues,EigVectors,wz,w1,r,r_d,radius]=findNormalModes(N,alpha(i));
+        EigValueData = horzcat(EigValueData,EigValues);
+        EigVectorData = cat(3,EigVectorData,EigVectors);
+    end
+end
+
+
+function [EigValues,EigVectors,omega_z_squared,omega_1_squared,r,r_d,radius]=findNormalModes(N,alpha)
     global r r_d omega_z_squared omega_1_squared N;
     G = Greens(alpha);
     omega_z_squared = G;
     omega_1_squared = (1-G)/2;
+%     omega_z_squared = 1;
+%     omega_1_squared = 1;
     final_positions = crystal_graphs_energy(N,omega_z_squared,omega_1_squared);
     r = zeros(N,3);
     for i = 1:N
         r(i,:) = final_positions(i,1:3);
     end
+    radius = sqrt(sum(r.^2,2));
     r_d = zeros(N,N);
     for i = 1:N
         for j = 1:N
@@ -53,7 +73,7 @@ function [EigValues,EigVectors,omega_z_squared,omega_1_squared,r]=findNormalMode
     EigValues = diag(DiagValue);
 end
 
-function w_p = plasmaFreq(alpha,r)
+
 
 function G = Greens(alpha)
     if alpha < 1
