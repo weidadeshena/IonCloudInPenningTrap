@@ -1,8 +1,8 @@
 clear all
 clf
-N = 60;
+N = 300;
 alpha = 1;
-repeat = 50;
+repeat = 20;
 
 data = zeros(3*N,repeat);
 for i = 1:repeat
