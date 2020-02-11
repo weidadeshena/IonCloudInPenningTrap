@@ -1,23 +1,37 @@
-% clear all
+clear all
 clf
-global EigValues EigVectors positions N;
-% load NormalModes EigValues EigVectors positions
-load NormalModes_nonspherical EigValues EigVectors positions
+N = 60;
+alpha = 1;
+repeat = 50;
 
-
-N = size(EigValues,1);
-
-% folder = [num2str(N/3),'IonModes'];
-folder = [num2str(N/3),'IonModes_alpha0.1'];
-if 7 ~= exist(folder,'dir')
-    mkdir(folder);
+data = zeros(3*N,repeat);
+for i = 1:repeat
+    [EigValues,EigVectors,positions] = findNormalModes(N,alpha);
+    data(:,i) = EigValues;
 end
-for i = 1:N
-    fig = plotMode(i);
-    temp = ['Mode',num2str(i),'freq',num2str(EigValues(i)),'.fig'];
-    temp = fullfile(folder,temp);
-    saveas(fig,temp)
-end
+
+
+% clf
+% hAxes = axes('NextPlot','add',...           %# Add subsequent plots to the axes,
+%              'DataAspectRatio',[1 1 1],...  %#   match the scaling of each axis,
+%              'XLim',[-1.01 0.01],...               %#   set the x axis limit,
+%              'YLim',[0 eps],...             %#   set the y axis limit (tiny!),
+%              'Color','none');               %#   and don't use a background color
+% plot(EigValues,0,'bx');
+
+histogram(data,50)
+
+
+% folder = [N,'IonModes_alpha',num2str(alpha)];
+% if 7 ~= exist(folder,'dir')
+%     mkdir(folder);
+% end
+% for i = 1:3*N
+%     fig = plotMode(i);
+% %     temp = ['Mode',num2str(i),'freq',num2str(EigValues(i)),'.fig'];
+% %     temp = fullfile(folder,temp);
+% %     saveas(fig,temp)
+% end
 
 % plotMode(963)
 
@@ -26,10 +40,10 @@ function fig = plotMode(j)
 % global EigValues EigVectors positions;
     axisMin = min(positions(:))-0.3;
     axisMax = max(positions(:))+0.3;
-    if j > N
+    if j > 3*N
         error('We dont have that many modes!')
     end
-    vectors = reshape(EigVectors(:,j),[N/3,3]);
+    vectors = reshape(EigVectors(:,j),[N,3]);
     x = positions(:,1);
     y = positions(:,2);
     z = positions(:,3);

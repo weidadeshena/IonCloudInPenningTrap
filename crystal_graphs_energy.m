@@ -1,4 +1,4 @@
-function [final_positions] = crystal_graphs_energy(ions,om_z_squared,om_1_squared)
+function [final_positions] = crystal_graphs_energy(ions,om_z_squared,om_1_squared,graph,energy)
 
 % ion_positions = crystals(ions,om_z_squared,om_1_squared);
 final_positions = crystals(ions,om_z_squared,om_1_squared);
@@ -7,61 +7,59 @@ final_positions = crystals(ions,om_z_squared,om_1_squared);
 r = sqrt(final_positions(:,1).^2 + final_positions(:,2).^2 );
 
 final_positions = horzcat(final_positions,r);
-min_axis = min(min(final_positions(:,:)));
-max_axis = max(max(final_positions(:,:)));
+if graph
+    min_axis = min(min(final_positions(:,:)));
+    max_axis = max(max(final_positions(:,:)));
 
-figure(1)
-hold off;
-% for ion_number = 1:ions
-%     
-%     plot3(ion_positions(end,ion_number*3-2),ion_positions(end,ion_number*3-1),ion_positions(end,3*ion_number),'b*');
-%     
-%     hold on
-% end
+    figure(1)
+    hold off;
 
-plot3(final_positions(:,1),final_positions(:,2),final_positions(:,3),'b*')
+    plot3(final_positions(:,1),final_positions(:,2),final_positions(:,3),'b*')
 
 
-axis([min_axis max_axis min_axis max_axis min_axis max_axis]);
-axis square
-grid on
-view(0,0)
+    axis([min_axis max_axis min_axis max_axis min_axis max_axis]);
+    axis square
+    grid on
+    view(0,0)
 
 
-hold off
+    hold off
 
-final_positions(:,[4 3]);
-
-total_coulomb_energy=0;
-total_trap_energy=0;
-
-
-for ion_number_1 = 1:ions-1
-for ion_number_2 = ion_number_1+1:ions
-    
-    xxx = ( final_positions(ion_number_1,1) - final_positions(ion_number_2,1))^2;
-        yyy = ( final_positions(ion_number_1,2) - final_positions(ion_number_2,2))^2;
-        zzz = ( final_positions(ion_number_1,3) - final_positions(ion_number_2,3))^2;
-        ion_ion_distance = (xxx + yyy + zzz)^(0.5);
-    
-        
-    total_coulomb_energy = total_coulomb_energy +  1/ion_ion_distance;   
+    figure(2)
+    [gaussian_filtered_image,simulated_image] = simulate_image(final_positions(:,4),final_positions(:,3));
     
 end
+if energy
+    final_positions(:,[4 3]);
+    total_coulomb_energy=0;
+    total_trap_energy=0;
+
+
+    for ion_number_1 = 1:ions-1
+    for ion_number_2 = ion_number_1+1:ions
+
+        xxx = ( final_positions(ion_number_1,1) - final_positions(ion_number_2,1))^2;
+            yyy = ( final_positions(ion_number_1,2) - final_positions(ion_number_2,2))^2;
+            zzz = ( final_positions(ion_number_1,3) - final_positions(ion_number_2,3))^2;
+            ion_ion_distance = (xxx + yyy + zzz)^(0.5);
+
+
+        total_coulomb_energy = total_coulomb_energy +  1/ion_ion_distance;   
+
+    end
+    end
+
+    for ion_number_1 = 1:ions
+        total_trap_energy = total_trap_energy + 0.5 * (om_1_squared * (final_positions(ion_number_1,1)^2 + ...
+        final_positions(ion_number_1,2)^2) + om_z_squared * final_positions(ion_number_1,3)^2);
+
+    end
+    hold on
+    total_energy = total_coulomb_energy+ total_trap_energy;
+    total_energy
 end
 
-for ion_number_1 = 1:ions
-    total_trap_energy = total_trap_energy + 0.5 * (om_1_squared * (final_positions(ion_number_1,1)^2 + ...
-    final_positions(ion_number_1,2)^2) + om_z_squared * final_positions(ion_number_1,3)^2);
-    
-end
-hold on
-total_energy = total_coulomb_energy+ total_trap_energy;
-total_energy
 
-
-figure(2)
-[gaussian_filtered_image,simulated_image] = simulate_image(final_positions(:,4),final_positions(:,3));
 %axis square
 
 
@@ -189,7 +187,7 @@ function [positions] = crystals(num_of_ions,omegaz_squared,omega1_squared)
 %Write this initial script for n ions
 %Put constants here.
 %num_of_ions = 3;
-num_of_time_steps = 20000;
+num_of_time_steps = 10000;
 %omega1_squared = 1-0.5*omegaz_squared;
 time_step_size = 0.1;
 
