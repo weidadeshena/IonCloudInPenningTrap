@@ -1,14 +1,14 @@
 clear all
 clf
-N = 60;
+N = 6;
 alpha = 1;
-repeat = 50;
-
-data = zeros(3*N,repeat);
-for i = 1:repeat
-    [EigValues,EigVectors,positions] = findNormalModes(N,alpha);
-    data(:,i) = EigValues;
-end
+% repeat = 50;
+% 
+% data = zeros(3*N,repeat);
+% for i = 1:repeat
+%     [EigValues,EigVectors,positions] = findNormalModes(N,alpha);
+%     data(:,i) = EigValues;
+% end
 
 
 % clf
@@ -19,24 +19,24 @@ end
 %              'Color','none');               %#   and don't use a background color
 % plot(EigValues,0,'bx');
 
-histogram(data,50)
+% histogram(data,50)
 
 
-% folder = [N,'IonModes_alpha',num2str(alpha)];
-% if 7 ~= exist(folder,'dir')
-%     mkdir(folder);
-% end
-% for i = 1:3*N
-%     fig = plotMode(i);
-% %     temp = ['Mode',num2str(i),'freq',num2str(EigValues(i)),'.fig'];
-% %     temp = fullfile(folder,temp);
-% %     saveas(fig,temp)
-% end
+folder = [num2str(N),'IonModes_alpha',num2str(alpha)];
+if 7 ~= exist(folder,'dir')
+    mkdir(folder);
+end
+[EigValues,EigVectors,positions] = findNormalModes(N,alpha);
+for i = 1:3*N
+    fig = plotMode(i,EigVectors,positions,N);
+    temp = ['Mode',num2str(i),'freq',num2str(EigValues(i)),'.fig'];
+    temp = fullfile(folder,temp);
+    saveas(fig,temp)
+end
 
 % plotMode(963)
 
-function fig = plotMode(j)
-    global EigVectors positions N;
+function fig = plotMode(j,EigVectors,positions,N)
 % global EigValues EigVectors positions;
     axisMin = min(positions(:))-0.3;
     axisMax = max(positions(:))+0.3;

@@ -1,14 +1,17 @@
-N = 100;
+
+N = 200;
 alpha = 1;
 [om_z_squared,om_1_squared] = Greens(alpha);
 positions = crystal_graphs_energy(N,om_z_squared,om_1_squared,0,0);
+
+% load NormalModes_1000 positions
 ionRange = floor((max(positions) - min(positions))/2);
-sphereRadius = min(ionRange)*0.7;
+sphereRadius = min(ionRange)*0.5;
 xInc = ionRange(1)*0.2;
 yInc = ionRange(2)*0.2;
 zInc = ionRange(3)*0.2;
 loopNumber = 3;
-
+ionCounter = 0;
 for i = -2:2
     for j = -2:2
         for k = -2:2
@@ -18,7 +21,7 @@ for i = -2:2
 end
 
 numberPerSphere = ionCounter/(5^3);
-volume = numberPerSphere/(4*pi/3*sphereRadius^3);
+volume = numberPerSphere/(4*pi/3*sphereRadius^3)
     
 
 function numberOfIons = inSphere(sphereX,sphereY,sphereZ,sphereR,positions)
