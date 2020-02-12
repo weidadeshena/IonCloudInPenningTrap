@@ -1,4 +1,3 @@
-clear all
 clf
 N = 6;
 alpha = 1;
@@ -9,7 +8,6 @@ alpha = 1;
 %     [EigValues,EigVectors,positions] = findNormalModes(N,alpha);
 %     data(:,i) = EigValues;
 % end
-
 
 % clf
 % hAxes = axes('NextPlot','add',...           %# Add subsequent plots to the axes,
