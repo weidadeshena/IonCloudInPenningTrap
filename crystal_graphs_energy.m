@@ -8,11 +8,12 @@ r = sqrt(final_positions(:,1).^2 + final_positions(:,2).^2 );
 
 final_positions = horzcat(final_positions,r);
 if graph
+    disp('plotting graph')
     min_axis = min(min(final_positions(:,:)));
     max_axis = max(max(final_positions(:,:)));
 
     figure(1)
-    hold off;
+%     hold off;
 
     plot3(final_positions(:,1),final_positions(:,2),final_positions(:,3),'b*')
 
@@ -54,7 +55,7 @@ if energy
         final_positions(ion_number_1,2)^2) + om_z_squared * final_positions(ion_number_1,3)^2);
 
     end
-    hold on
+%     hold on
     total_energy = total_coulomb_energy+ total_trap_energy;
     total_energy
 end

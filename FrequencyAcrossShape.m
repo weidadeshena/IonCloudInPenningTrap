@@ -2,7 +2,7 @@
 clear all
 %find radii for N=6,8,30
 alpha = [0.1 0.2 0.3 0.4 0.5 0.6 0.85 0.95 1 1.05 1.2 1.67 2 2.5 3.3 5 10];
-EigValueData = acrossAlphaFreq(100,alpha);
+EigValueData = acrossAlphaFreq(6,alpha);
 BreathingModes = sqrt(-min(EigValueData));
 plot(alpha,BreathingModes);
 
