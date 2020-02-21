@@ -33,7 +33,9 @@ end
 if energy
     final_positions(:,[4 3]);
     total_coulomb_energy=0;
-    total_trap_energy=0;
+%     total_trap_energy=0;
+    r_energy = 0;
+    z_energy = 0;
 
 
     for ion_number_1 = 1:ions-1
@@ -51,11 +53,17 @@ if energy
     end
 
     for ion_number_1 = 1:ions
-        total_trap_energy = total_trap_energy + 0.5 * (om_1_squared * (final_positions(ion_number_1,1)^2 + ...
-        final_positions(ion_number_1,2)^2) + om_z_squared * final_positions(ion_number_1,3)^2);
+        r_energy = r_energy + 0.5 * om_1_squared * (final_positions(ion_number_1,1)^2 + final_positions(ion_number_1,2)^2);
+        z_energy = z_energy + 0.5 * om_z_squared * final_positions(ion_number_1,3)^2;
+%         total_trap_energy = total_trap_energy + 0.5 * (om_1_squared * (final_positions(ion_number_1,1)^2 + ...
+%         final_positions(ion_number_1,2)^2) + om_z_squared * final_positions(ion_number_1,3)^2);
 
     end
 %     hold on
+    r_energy
+    z_energy
+    total_trap_energy = r_energy+z_energy;
+    total_coulomb_energy
     total_energy = total_coulomb_energy+ total_trap_energy;
     total_energy
 end

@@ -1,6 +1,6 @@
 clf
-N = 6;
-alpha = 1;
+N = 40;
+alpha = 3;
 % repeat = 50;
 % 
 % data = zeros(3*N,repeat);

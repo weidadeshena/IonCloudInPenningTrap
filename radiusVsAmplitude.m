@@ -1,12 +1,12 @@
 
-% N = 100;
-% alpha = 1;
-% [EigValues,EigVectors,positions] = findNormalModes(N,alpha);
-load NormalModes_1000 EigValues EigVectors positions;
-N = 1000;
+N = 80;
+alpha = 1;
+[EigValues,EigVectors,positions] = findNormalModes(N,alpha);
+% load NormalModes_1000 EigValues EigVectors positions;
+% N = 1000;
 EigVectors = reshape(EigVectors,N,3,3*N);
-lowerRange = -0.46;
-upperRange = -0.44;
+lowerRange = -1;
+upperRange = -0.98;
 
 plotRadialAxial(positions,EigValues,EigVectors,lowerRange,upperRange,folder)
 folder = [num2str(N),'Ion_alpha',num2str(alpha),'range',num2str(lowerRange),num2str(upperRange)];
@@ -48,11 +48,11 @@ function plotRadialAxial(positions,EigValues,EigVectors,lowerRange,UpperRange,fo
         subplot(1,2,1)
         scatter(radial,radialAmplitude(:,:,i),'DisplayName',num2str(EigValuesRange(i)));
         legend
-%         ylim([0 maxAmplitude(i)+0.05]);
+        ylim([-maxAmplitude(i)-0.05 maxAmplitude(i)+0.05]);
         subplot(1,2,2)
         scatter(axial,axialAmplitude(:,:,i),'DisplayName',num2str(EigValuesRange(i)));
         legend
-%         ylim([0 maxAmplitude(i)+0.05]);
+        ylim([-maxAmplitude(i)-0.05 maxAmplitude(i)+0.05]);
         temp = ['freq',num2str(EigValuesRange(i)),'.fig'];
         temp = fullfile(folder,temp);
         saveas(fig,temp)
