@@ -198,7 +198,7 @@ function [positions] = crystals(num_of_ions,omegaz_squared,omega1_squared)
 %num_of_ions = 3;
 num_of_time_steps = 10000;
 %omega1_squared = 1-0.5*omegaz_squared;
-time_step_size = 0.1;
+time_step_size = 0.01;
 
 % ion_forces = zeros(num_of_ions,num_of_ions*3);
 r_cubed = zeros(num_of_ions, num_of_ions);
