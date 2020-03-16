@@ -185,6 +185,7 @@ toc
 % colorbar
 figure(2)
 imagesc(filtered_image);
+set(gca,'XTick',[], 'YTick', [])
 % colorbar
 % 
 % amplitude
