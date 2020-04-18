@@ -1,4 +1,4 @@
-function [final_positions] = crystal_graphs_energy(ions,om_z_squared,om_1_squared,graph,energy)
+function [final_positions,gaussian_filtered_image] = crystal_graphs_energy(ions,om_z_squared,om_1_squared,graph,energy)
 
 % ion_positions = crystals(ions,om_z_squared,om_1_squared);
 final_positions = crystals(ions,om_z_squared,om_1_squared);
@@ -60,10 +60,10 @@ if energy
 
     end
 %     hold on
-    r_energy
-    z_energy
+%     r_energy
+%     z_energy
     total_trap_energy = r_energy+z_energy;
-    total_coulomb_energy
+%     total_coulomb_energy
     total_energy = total_coulomb_energy+ total_trap_energy;
     total_energy
 end
@@ -185,6 +185,7 @@ toc
 % colorbar
 figure(2)
 imagesc(filtered_image);
+set(gca,'XTick',[], 'YTick', [])
 % colorbar
 % 
 % amplitude
@@ -198,7 +199,7 @@ function [positions] = crystals(num_of_ions,omegaz_squared,omega1_squared)
 %num_of_ions = 3;
 num_of_time_steps = 10000;
 %omega1_squared = 1-0.5*omegaz_squared;
-time_step_size = 0.1;
+time_step_size = 0.01;
 
 % ion_forces = zeros(num_of_ions,num_of_ions*3);
 r_cubed = zeros(num_of_ions, num_of_ions);
