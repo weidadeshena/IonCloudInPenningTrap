@@ -1,4 +1,4 @@
-function [final_positions] = crystal_graphs_energy(ions,om_z_squared,om_1_squared,graph,energy)
+function [final_positions,gaussian_filtered_image] = crystal_graphs_energy(ions,om_z_squared,om_1_squared,graph,energy)
 
 % ion_positions = crystals(ions,om_z_squared,om_1_squared);
 final_positions = crystals(ions,om_z_squared,om_1_squared);
@@ -60,10 +60,10 @@ if energy
 
     end
 %     hold on
-    r_energy
-    z_energy
+%     r_energy
+%     z_energy
     total_trap_energy = r_energy+z_energy;
-    total_coulomb_energy
+%     total_coulomb_energy
     total_energy = total_coulomb_energy+ total_trap_energy;
     total_energy
 end

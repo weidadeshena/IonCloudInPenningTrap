@@ -1,5 +1,5 @@
 clf
-N = 40;
+N = 100;
 alpha = 3;
 % repeat = 50;
 % 
