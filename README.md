@@ -1,6 +1,6 @@
 # Physics MSci project: Theory and Simulation of Laser Cooled Ions In A Penning Trap
 
-Continued work from previous students
+Continued work from a previous project
 
 ## My main contribution:
 - optimise the function finding the stable configuration, which is now a lot faster and can run unlimited number of ions {in [crystal_graph_energy.m](https://github.com/weidadeshena/IonCloudInPenningTrap/blob/master/crystal_graphs_energy.m)}
