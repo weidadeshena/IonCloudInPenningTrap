@@ -1,15 +1,15 @@
-
+% the amplitude of a specific normal modes on a ion plotted against the 
+% radial/axial position of the ion
 N = 80;
 alpha = 1;
 [EigValues,EigVectors,positions] = findNormalModes(N,alpha);
-% load NormalModes_1000 EigValues EigVectors positions;
-% N = 1000;
 EigVectors = reshape(EigVectors,N,3,3*N);
 lowerRange = -1;
 upperRange = -0.98;
 
-plotRadialAxial(positions,EigValues,EigVectors,lowerRange,upperRange,folder)
 folder = [num2str(N),'Ion_alpha',num2str(alpha),'range',num2str(lowerRange),num2str(upperRange)];
+plotRadialAxial(positions,EigValues,EigVectors,lowerRange,upperRange,folder)
+
 
 function plotAmplitude(positions,EigVectors)
     radius = sqrt(sum(positions.^2,2));

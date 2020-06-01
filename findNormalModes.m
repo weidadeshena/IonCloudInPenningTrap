@@ -1,4 +1,6 @@
 function [EigValues,EigVectors,r]=findNormalModes(N,alpha)
+% analytically find the normal modes. the eigenvalues are -frequency^2 and
+% the eigen vectors are the direction of the eigenmodes
     [omega_z_squared,omega_1_squared] = Greens(alpha);
     final_positions = crystal_graphs_energy(N,omega_z_squared,omega_1_squared,0,0);
     r = zeros(N,3);
@@ -11,7 +13,6 @@ function [EigValues,EigVectors,r]=findNormalModes(N,alpha)
             r_d(i,j) = sqrt(sum((r(i,:)-r(j,:)).^2));
         end
     end
-    % r_d = (r_d + r_d') - eye(size(r_d,1)).*diag(r_d);
 
     D = zeros(3*N,3*N);
 

@@ -1,3 +1,5 @@
+% find the breathing mode frequency across different alpha
+
 % assume M = 1, Ze^2/(4pi epsilon_0) = 1
 clear all
 %find radii for N=6,8,30

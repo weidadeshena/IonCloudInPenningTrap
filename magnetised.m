@@ -1,20 +1,21 @@
+% assume we are in omega_c/2 frame, when the ion cloud is rotating in this
+% frame, we say the ion cloud is magnetised.
 
-% positions = crystal_graphs_energy(4,1,1,0,0);
-% positions = positions(:,1:3);
-N = 50;
+
+N = 300;
 omega_1_squared = 1;
 omega_z_squared = 1;
 positions = rand(N,3);
 positions = update(N,positions,0,omega_1_squared,omega_z_squared,100);
-% positions = update(N,positions,0.01,omega_1_squared,omega_z_squared,100);
 positions = update(N,positions,0.1,omega_1_squared,omega_z_squared,100);
-% positions = update(N,positions,0.2,omega_1_squared,omega_z_squared,100);
 positions = update(N,positions,0.5,omega_1_squared,omega_z_squared,100);
-% positions = update(N,positions,0.66135,0.66135,0.1693,100);
-% update(N,positions,0.5,0.66135,0.1693,100)
+
 
 
 function newPositions = update(N,oldPositions,omega_r_squared,omega_1_squared,omega_z_squared,steps)
+% find the postions after a given number of steps
+% omega_r squared is the angular velocity of the ion cloud in the rotating
+% frame.
     stepSize = 0.01;
     theta = sqrt(omega_r_squared)*stepSize;
     R = [cos(theta),-sin(theta),0;sin(theta),cos(theta),0;0,0,1];
@@ -22,12 +23,12 @@ function newPositions = update(N,oldPositions,omega_r_squared,omega_1_squared,om
     axis([-10,10,-10,10,-10,10])
     for i = 1:steps
         F = force(N,oldPositions,omega_r_squared,omega_1_squared,omega_z_squared);
-        totalforce = sum(sum(F)); % print sumed forces
+%         totalforce = sum(sum(F)) % print sumed forces
         newPositions = oldPositions + F*(0.5*(1/(1+exp(7.5*i/steps - 4)))); % proportional control
         % take rotation into account
         newPositions = (R*newPositions')';
-        % print rotation frequency
-        omega = angularFrequency(newPositions(:,1:2),oldPositions(:,1:2),stepSize);
+%         % print rotation frequency
+%         omega = angularFrequency(newPositions(:,1:2),oldPositions(:,1:2),stepSize)
         oldPositions = newPositions;
         set(s,'XData',newPositions(:,1),'YData',newPositions(:,2),'ZData',newPositions(:,3));
         drawnow
@@ -36,6 +37,7 @@ function newPositions = update(N,oldPositions,omega_r_squared,omega_1_squared,om
 end
 
 function omega = angularFrequency(newPositions,oldPositions,time)
+% calculate the angualr velocity of the ion cloud
     dotProduct = sum(oldPositions.*newPositions,2);
     r1 = sqrt(sum(oldPositions.^2,2));
     r2 = sqrt(sum(newPositions.^2,2));
@@ -49,6 +51,7 @@ end
 % omega_1_squared is the radial trapping frequency
 % omega_z_squared is the axial trapping frequency
 function F = force(N,positions,omega_r_squared,omega_1_squared,omega_z_squared)
+% calculate the force on each ion
     F = zeros(N,3);
     inverseDCubed = dist(positions,N);
 
@@ -65,6 +68,7 @@ function F = force(N,positions,omega_r_squared,omega_1_squared,omega_z_squared)
 end
 
 function inverseDistanceCubed = dist(positions,N)
+% calculate the distance between ion i and ion j, stored in a matrix
 inverseDistance = inf(N,N);
 for i = 1:N
     for j = i+1:N

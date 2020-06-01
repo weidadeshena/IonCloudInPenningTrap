@@ -1,3 +1,6 @@
+% attempts to find the structure of the inner crystal to justify why the
+% density is the same. Failed.
+
 % density_list = zeros(10);
 % for i = 1:5
 %     N = i*20+80;

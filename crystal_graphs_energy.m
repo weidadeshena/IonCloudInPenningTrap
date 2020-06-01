@@ -1,6 +1,12 @@
-function [final_positions,gaussian_filtered_image] = crystal_graphs_energy(ions,om_z_squared,om_1_squared,graph,energy)
+function [final_positions] = crystal_graphs_energy(ions,om_z_squared,om_1_squared,graph,energy)
+% function that calculate the final positions of the ions given trapping
+% parameters. 
+% Input: number of ions; omega_z squared, omega_1 squared,
+% boolean value (0 or 1) for graph display, boolean value (0 or 1) for
+% showing the energy in the command window. 
+% Output: final positions of the ions: x,y,z,r
 
-% ion_positions = crystals(ions,om_z_squared,om_1_squared);
+
 final_positions = crystals(ions,om_z_squared,om_1_squared);
 
 % final_positions = reshape(ion_positions(end,:),3,size(ion_positions,2)/3)'; 
@@ -8,6 +14,7 @@ r = sqrt(final_positions(:,1).^2 + final_positions(:,2).^2 );
 
 final_positions = horzcat(final_positions,r);
 if graph
+    % plot graph
     disp('plotting graph')
     min_axis = min(min(final_positions(:,:)));
     max_axis = max(max(final_positions(:,:)));
@@ -31,20 +38,20 @@ if graph
     
 end
 if energy
+    % show energy in the terminal
     final_positions(:,[4 3]);
     total_coulomb_energy=0;
-%     total_trap_energy=0;
     r_energy = 0;
     z_energy = 0;
 
-
+    % calculating the total coulomb energy
     for ion_number_1 = 1:ions-1
     for ion_number_2 = ion_number_1+1:ions
 
         xxx = ( final_positions(ion_number_1,1) - final_positions(ion_number_2,1))^2;
-            yyy = ( final_positions(ion_number_1,2) - final_positions(ion_number_2,2))^2;
-            zzz = ( final_positions(ion_number_1,3) - final_positions(ion_number_2,3))^2;
-            ion_ion_distance = (xxx + yyy + zzz)^(0.5);
+        yyy = ( final_positions(ion_number_1,2) - final_positions(ion_number_2,2))^2;
+        zzz = ( final_positions(ion_number_1,3) - final_positions(ion_number_2,3))^2;
+        ion_ion_distance = (xxx + yyy + zzz)^(0.5);
 
 
         total_coulomb_energy = total_coulomb_energy +  1/ion_ion_distance;   
@@ -52,18 +59,15 @@ if energy
     end
     end
 
+    % calculating trap energy
     for ion_number_1 = 1:ions
+        % trapping energy on radial direction
         r_energy = r_energy + 0.5 * om_1_squared * (final_positions(ion_number_1,1)^2 + final_positions(ion_number_1,2)^2);
+        % trapping energy on axial direction
         z_energy = z_energy + 0.5 * om_z_squared * final_positions(ion_number_1,3)^2;
-%         total_trap_energy = total_trap_energy + 0.5 * (om_1_squared * (final_positions(ion_number_1,1)^2 + ...
-%         final_positions(ion_number_1,2)^2) + om_z_squared * final_positions(ion_number_1,3)^2);
 
     end
-%     hold on
-%     r_energy
-%     z_energy
     total_trap_energy = r_energy+z_energy;
-%     total_coulomb_energy
     total_energy = total_coulomb_energy+ total_trap_energy;
     total_energy
 end
@@ -73,7 +77,7 @@ end
 
 
 function [filtered_image,sim_image] = simulate_image(amplitude,z_pos);
-%Make a 2d image where the photo lives
+% Make a 2d image where the photo lives
 pixel_unit_scaling = 3.8;
 image_size = 101;%round(2* max(max(pixel_unit_scaling*amplitude),max(pixel_unit_scaling*abs(z_pos)))) + 10;
 
@@ -193,82 +197,61 @@ set(gca,'XTick',[], 'YTick', [])
 
 
 function [positions] = crystals(num_of_ions,omegaz_squared,omega1_squared)
+% find the positions of the ions in given trapping parameters
 
-%Write this initial script for n ions
-%Put constants here.
-%num_of_ions = 3;
-num_of_time_steps = 10000;
-%omega1_squared = 1-0.5*omegaz_squared;
+% set the number of time steps and the time step size
+% honestly 100 time steps in probably good enough... see magnetised.m for
+% the animation, with 200 time steps the ion cloud is pretty much
+% configured.
+num_of_time_steps = 200;
 time_step_size = 0.01;
 
-% ion_forces = zeros(num_of_ions,num_of_ions*3);
+% initialise distance between ions and trap forces
 r_cubed = zeros(num_of_ions, num_of_ions);
 trap_forces = zeros(num_of_ions,3);
-% total_force = zeros(num_of_time_steps,3*num_of_ions);
 
-
+% initialise random positions for the ions
 positions = rand(num_of_ions,3);
 
 
 tic
 for time_step = 1:num_of_time_steps
-
+% for each timestep, calculate the coulomb force
 coulomb_forces = zeros(num_of_ions,3);
-for ion_number = 1:num_of_ions
-    for k = 1:num_of_ions
-        r_cubed(ion_number,k) = sum((positions(ion_number,:)-positions(k,:)).^2)^1.5;
-    end 
-end
-
-
 
 for ion_number = 1:num_of_ions
     
     for l = 1:num_of_ions
-    
+        % calculate the distances cubed between ion i and ion j, store it 
+        %in a matrix. cubed since it will be convenient later on....
+        r_cubed(ion_number,l) = sum((positions(ion_number,:)-positions(l,:)).^2)^1.5;
         if l ~= ion_number
-  
+            % calculate the coulomb for between ion i and ion j
+            %force from the x-direction
             coulomb_forces(ion_number,1) = coulomb_forces(ion_number,1) + (-positions(l,1) +...
             positions(ion_number,1))/r_cubed(ion_number,l); 
-            %force from the x-direction
+            %force from the y-direction
             coulomb_forces(ion_number,2) = coulomb_forces(ion_number,2) + (-positions(l,2) +...
             positions(ion_number,2))/r_cubed(ion_number,l); 
-            %force from the y-direction
+            %force from the z-direction
             coulomb_forces(ion_number,3) = coulomb_forces(ion_number,3) + (-positions(l,3) +...
             positions(ion_number,3))/r_cubed(ion_number,l); 
-            %force from the z-direction
-            
         end
     
     end
         
 end
 
-
-% trap_forces = -omega1_squared*positions;
-% trap_forces(:,3) = -omegaz_squared*positions(:,3);
-
+% calculate the trapping force
 for ion_number = 1:num_of_ions
     trap_forces(ion_number,1) = -omega1_squared * positions(ion_number,1);
     trap_forces(ion_number,2) = -omega1_squared * positions(ion_number,2);
     trap_forces(ion_number,3)   = -omegaz_squared * positions(ion_number,3);
 end
 
-
+% update the position
 positions = positions + time_step_size*(coulomb_forces+trap_forces);
 
-% for ion_number = 1:num_of_ions
-%    
-%         positions(ion_number,1) = positions (ion_number,1) + time_step_size*(coulomb_forces(ion_number,1) + trap_forces(ion_number,1));
-%         positions(ion_number,2) = positions (ion_number,2) + time_step_size*(coulomb_forces(ion_number,2) + trap_forces(ion_number,2));
-%         positions(ion_number,3) = positions (ion_number,3) + time_step_size*(coulomb_forces(ion_number,3) + trap_forces(ion_number,3));
-%         
-%         
-% 
-% %         total_force(time_step,ion_number*3-2) = sum(ion_forces(1:3:end,ion_number)) + trap_forces(3*ion_number-2);
-% %         total_force(time_step,ion_number*3-1) = sum(ion_forces(2:3:end,ion_number)) + trap_forces(3*ion_number-1);
-% %         total_force(time_step,ion_number*3) = sum(ion_forces(3:3:end,ion_number)) + trap_forces(3*ion_number);
-% end
 
 end
 toc

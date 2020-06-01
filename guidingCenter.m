@@ -1,6 +1,6 @@
 load NormalModes positions r_d wz
 N = 4;
-
+% my attempts for guiding centre approximation.... didn't work
 timestep = 1000;
 dt = 0.01;
 B = 2;
