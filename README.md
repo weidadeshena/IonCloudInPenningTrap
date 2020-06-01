@@ -1,4 +1,4 @@
-# 4th year MSci project: Theory and Simulation of Laser Cooled Ions In A Penning Trap
+# Physics MSci project: Theory and Simulation of Laser Cooled Ions In A Penning Trap
 
 Continued work from previous students
 
